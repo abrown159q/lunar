@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Celestial Arrival Predictor</title>
+
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background: #f4f6f9;
+}
+
+h1 {
+    text-align: center;
+}
+
+.controls {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+}
+
+label {
+    font-weight: bold;
+}
+
+input {
+    padding: 5px;
+}
+
+button {
+    padding: 8px 15px;
+    cursor: pointer;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+.panel {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+#topDates {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.top-date {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+.legend {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.legend-color {
+    width: 18px;
+    height: 18px;
+    border: 1px solid #333;
+}
+
+#chartContainer {
+    margin-top: 20px;
+}
+
+@media (max-width: 1000px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+
+<h1>Celestial Arrival Predictor</h1>
+
+<div class="controls">
+
+    <div>
+        <label>Last Arrival Date</label><br>
+        <input type="date" id="lastDate">
+    </div>
+
+    <div>
+        <label>Minimum Cycle</label><br>
+        <input type="number" id="minGap" value="26">
+    </div>
+
+    <div>
+        <label>Maximum Cycle</label><br>
+        <input type="number" id="maxGap" value="30">
+    </div>
+
+    <button id="runBtn">Calculate</button>
+
+</div>
+
+<div class="grid">
+
+    <div class="panel">
+        <div id="calendar"></div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background:#d6eaff"></div>
+                <span>1-5%</span>
+            </div>
+
+            <div class="legend-item">
+                <div class="legend-color" style="background:#8ec5ff"></div>
+                <span>5-15%</span>
+            </div>
+
+            <div class="legend-item">
+                <div class="legend-color" style="background:#4c8fff"></div>
+                <span>15-30%</span>
+            </div>
+
+            <div class="legend-item">
+                <div class="legend-color" style="background:#ffb347"></div>
+                <span>30-50%</span>
+            </div>
+
+            <div class="legend-item">
+                <div class="legend-color" style="background:#ff4d4d"></div>
+                <span>50%+</span>
+            </div>
+        </div>
+
+        <div id="chartContainer">
+            <canvas id="probabilityChart"></canvas>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>Highest Probability Dates</h2>
+        <div id="topDates"></div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+const DAY_MS = 86400000;
+let calendar;
+let chartInstance = null;
+
+function formatDate(date) {
+    return date.toISOString().split("T")[0];
+}
+
+function saveSettings() {
+    localStorage.setItem(
+        "lastArrivalDate",
+        document.getElementById("lastDate").value
+    );
+
+    localStorage.setItem(
+        "minGap",
+        document.getElementById("minGap").value
+    );
+
+    localStorage.setItem(
+        "maxGap",
+        document.getElementById("maxGap").value
+    );
+}
+
+function loadSettings() {
+
+    const last =
+        localStorage.getItem("lastArrivalDate");
+
+    const minGap =
+        localStorage.getItem("minGap");
+
+    const maxGap =
+        localStorage.getItem("maxGap");
+
+    if(last)
+        document.getElementById("lastDate").value = last;
+
+    if(minGap)
+        document.getElementById("minGap").value = minGap;
+
+    if(maxGap)
+        document.getElementById("maxGap").value = maxGap;
+}
+
+function probabilityColor(prob) {
+
+    if(prob >= 50)
+        return "#ff4d4d";
+
+    if(prob >= 30)
+        return "#ffb347";
+
+    if(prob >= 15)
+        return "#4c8fff";
+
+    if(prob >= 5)
+        return "#8ec5ff";
+
+    return "#d6eaff";
+}
+
+function calculateDistribution(
+    startDate,
+    minGap,
+    maxGap,
+    horizonDays = 365
+) {
+
+    const result = new Map();
+
+    const queue = [{
+        date: startDate,
+        probability: 1.0
+    }];
+
+    const cutoff =
+        startDate.getTime() +
+        horizonDays * DAY_MS;
+
+    while(queue.length > 0) {
+
+        const current = queue.shift();
+
+        for(
+            let gap=minGap;
+            gap<=maxGap;
+            gap++
+        ) {
+
+            const nextDate =
+                new Date(
+                    current.date.getTime()
+                    + gap * DAY_MS
+                );
+
+            if(nextDate.getTime() > cutoff)
+                continue;
+
+            const p =
+                current.probability /
+                (maxGap - minGap + 1);
+
+            const key =
+                formatDate(nextDate);
+
+            result.set(
+                key,
+                (result.get(key) || 0) + p
+            );
+
+            if(p > 0.000001) {
+                queue.push({
+                    date: nextDate,
+                    probability: p
+                });
+            }
+        }
+    }
+
+    return result;
+}
+
+function buildCalendar(probabilities) {
+
+    const events = [];
+
+    for(const [date, prob] of probabilities) {
+
+        const percent = prob * 100;
+
+        events.push({
+            title:
+                percent.toFixed(1) + "%",
+            start: date,
+            allDay: true,
+            backgroundColor:
+                probabilityColor(percent),
+            borderColor:
+                probabilityColor(percent)
+        });
+    }
+
+    calendar.removeAllEvents();
+    calendar.addEventSource(events);
+}
+
+function buildTopDates(probabilities) {
+
+    const container =
+        document.getElementById("topDates");
+
+    container.innerHTML = "";
+
+    const sorted =
+        [...probabilities.entries()]
+        .sort(
+            (a,b) => b[1] - a[1]
+        )
+        .slice(0, 100);
+
+    sorted.forEach(
+        ([date, prob], index) => {
+
+            const div =
+                document.createElement("div");
+
+            div.className = "top-date";
+
+            div.innerHTML =
+                "<strong>#"
+                + (index+1)
+                + "</strong><br>"
+                + date
+                + "<br>"
+                + (prob*100).toFixed(2)
+                + "%";
+
+            container.appendChild(div);
+        }
+    );
+}
+
+function buildChart(probabilities) {
+
+    const labels = [];
+    const values = [];
+
+    const sorted =
+        [...probabilities.entries()]
+        .sort(
+            (a,b) =>
+                new Date(a[0])
+                - new Date(b[0])
+        );
+
+    sorted.forEach(([d,p]) => {
+        labels.push(d);
+        values.push(
+            (p*100).toFixed(3)
+        );
+    });
+
+    const ctx =
+        document
+        .getElementById(
+            "probabilityChart"
+        );
+
+    if(chartInstance)
+        chartInstance.destroy();
+
+    chartInstance =
+        new Chart(ctx, {
+            type: "line",
+            data: {
+                labels,
+                datasets: [{
+                    label:
+                        "Arrival Probability (%)",
+                    data: values
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: "Probability (%)"
+                        }
+                    }
+                }
+            }
+        });
+}
+
+function runPrediction() {
+
+    const dateValue =
+        document.getElementById(
+            "lastDate"
+        ).value;
+
+    if(!dateValue) {
+        alert(
+            "Select a last arrival date."
+        );
+        return;
+    }
+
+    const minGap =
+        parseInt(
+            document.getElementById(
+                "minGap"
+            ).value
+        );
+
+    const maxGap =
+        parseInt(
+            document.getElementById(
+                "maxGap"
+            ).value
+        );
+
+    const startDate =
+        new Date(dateValue);
+
+    const probs =
+        calculateDistribution(
+            startDate,
+            minGap,
+            maxGap,
+            365
+        );
+
+    buildCalendar(probs);
+    buildTopDates(probs);
+    buildChart(probs);
+
+    saveSettings();
+}
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        loadSettings();
+
+        calendar =
+            new FullCalendar.Calendar(
+                document.getElementById(
+                    "calendar"
+                ),
+                {
+                    initialView:
+                        "dayGridMonth",
+                    height: 700
+                }
+            );
+
+        calendar.render();
+
+        document
+            .getElementById("runBtn")
+            .addEventListener(
+                "click",
+                runPrediction
+            );
+
+        if(
+            document
+            .getElementById(
+                "lastDate"
+            ).value
+        ) {
+            runPrediction();
+        }
+    }
+);
+
+</script>
+
+</body>
+</html>
