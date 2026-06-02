@@ -170,6 +170,7 @@ function setupHome() {
                 document.getElementById("lastDate").value = dateStr;
 
                 showDashboard();
+                initializeCalendar();
 
                 debug("enterBtn: entered dashboard successfully");
             }
