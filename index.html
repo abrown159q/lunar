@@ -1,75 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Celestial Arrival Predictor</title>
-
-<link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Celestial Object Tracker v2</title>
+    <link rel="stylesheet" href="css/style.css">
 
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 </head>
-
 <body>
 
-<header>
-    <h1>Celestial Arrival Predictor</h1>
-</header>
+<!-- HOME SCREEN -->
+<section id="homeScreen" class="screen">
 
-<section class="controls">
+    <h1>Celestial Object Tracker v3</h1>
 
-    <label>
-        Last Arrival
-        <input type="date" id="lastDate">
-    </label>
+    <div class="homeCard">
 
-    <label>
-        Min Cycle
-        <input type="number" id="minGap" value="26">
-    </label>
+        <h2>Days Since Last Appearance</h2>
 
-    <label>
-        Max Cycle
-        <input type="number" id="maxGap" value="30">
-    </label>
+        <p>Enter either a date or number of days.</p>
 
-    <button id="runBtn">
-        Calculate
-    </button>
+        <label>
+            Last appearance date:
+            <input type="date" id="homeDate">
+        </label>
 
-    <button id="clearBtn">
-        Clear Storage
-    </button>
+        <br><br>
 
+        <label>
+            OR days since:
+            <input type="number" id="homeDays" placeholder="e.g. 42" value="5">
+        </label>
+
+        <br><br>
+
+        <button id="enterBtn">
+            Enter System
+        </button>
+
+    </div>
+           <h2>Debug Console</h2>
+            <pre id="debugConsole"></pre>
 </section>
 
-<div class="layout">
+<!-- DASHBOARD SCREEN -->
+<section id="dashboardScreen" class="screen hidden">
 
-    <div class="leftPanel">
+    <header>
+        <h1>Prediction Dashboard</h1>
+    </header>
 
-        <div id="calendar"></div>
+    <section class="controls">
 
-        <canvas id="probabilityChart"></canvas>
+        <label>
+            Last Arrival
+            <input type="date" id="lastDate">
+        </label>
+
+        <label>
+            Min Cycle
+            <input type="number" id="minGap" value="26">
+        </label>
+
+        <label>
+            Max Cycle
+            <input type="number" id="maxGap" value="30">
+        </label>
+
+        <button id="runBtn">Calculate</button>
+        <button id="backBtn">Home</button>
+
+    </section>
+
+    <div class="layout">
+
+        <div class="leftPanel">
+
+            <div id="calendar"></div>
+
+            <canvas id="probabilityChart"></canvas>
+
+        </div>
+
+        <div class="rightPanel">
+
+            <h2>Highest Probability Dates</h2>
+            <div id="topDates"></div>
+
+            <h2>Debug Console</h2>
+            <pre id="debugConsole"></pre>
+
+        </div>
 
     </div>
 
-    <div class="rightPanel">
-
-        <h2>Highest Probability Dates</h2>
-
-        <div id="topDates"></div>
-
-        <h2>Debug Console</h2>
-
-        <pre id="debugConsole"></pre>
-
-    </div>
-
-</div>
+</section>
 
 <script src="js/debug.js"></script>
 <script src="js/storage.js"></script>
