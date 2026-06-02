@@ -1,45 +1,63 @@
-const DAY_MS =
-    86400000;
+const DAY_MS = 86400000;
+
+function formatDate(date) {
+    return date.toISOString().slice(0, 10);
+}
 
 function calculateDistribution(
     startDate,
     minGap,
     maxGap,
     horizonDays
-){
+) {
 
-    const t0 =
-        performance.now();
+    const t0 = performance.now();
 
-    debug(
-        "Starting calculation"
+    debug("Starting probability calculation");
+
+    const horizon =
+        startDate.getTime()
+        + horizonDays * DAY_MS;
+
+    /*
+    Probability mass by date
+    */
+
+    const probabilityMap = new Map();
+
+    probabilityMap.set(
+        formatDate(startDate),
+        1.0
     );
 
-    const results =
+    const arrivalProbabilities =
         new Map();
 
-    const queue = [{
-        date: startDate,
-        probability: 1
-    }];
+    const datesToProcess = [
+        startDate
+    ];
 
-    const cutoff =
-        startDate.getTime()
-        +
-        horizonDays * DAY_MS;
+    let processed = 0;
 
-    while(queue.length){
+    while(datesToProcess.length) {
 
-        const current =
-            queue.shift();
+        const currentDate =
+            datesToProcess.shift();
 
-        if(
-            TRACE_QUEUE &&
-            queue.length % 1000 === 0
-        ){
+        const currentKey =
+            formatDate(currentDate);
+
+        const currentProbability =
+            probabilityMap.get(currentKey);
+
+        processed++;
+
+        if(processed % 100 === 0) {
             debug(
-                "Queue",
-                queue.length
+                "Processed dates:",
+                processed,
+                "Queue:",
+                datesToProcess.length
             );
         }
 
@@ -47,11 +65,11 @@ function calculateDistribution(
             let gap=minGap;
             gap<=maxGap;
             gap++
-        ){
+        ) {
 
             const nextDate =
                 new Date(
-                    current.date.getTime()
+                    currentDate.getTime()
                     +
                     gap * DAY_MS
                 );
@@ -59,13 +77,16 @@ function calculateDistribution(
             if(
                 nextDate.getTime()
                 >
-                cutoff
-            ){
+                horizon
+            ) {
                 continue;
             }
 
-            const probability =
-                current.probability
+            const nextKey =
+                formatDate(nextDate);
+
+            const nextProbability =
+                currentProbability
                 /
                 (
                     maxGap
@@ -75,38 +96,43 @@ function calculateDistribution(
                     1
                 );
 
-            const key =
-                nextDate
-                .toISOString()
-                .slice(0,10);
-
-            results.set(
-                key,
+            arrivalProbabilities.set(
+                nextKey,
                 (
-                    results.get(key)
+                    arrivalProbabilities.get(
+                        nextKey
+                    )
                     || 0
                 )
                 +
-                probability
+                nextProbability
             );
 
             if(
-                TRACE_PROBABILITIES
-            ){
-                debug(
-                    key,
-                    probability
-                );
-            }
+                !probabilityMap.has(
+                    nextKey
+                )
+            ) {
 
-            if(
-                probability >
-                1e-6
-            ){
-                queue.push({
-                    date: nextDate,
-                    probability
-                });
+                probabilityMap.set(
+                    nextKey,
+                    nextProbability
+                );
+
+                datesToProcess.push(
+                    nextDate
+                );
+
+            } else {
+
+                probabilityMap.set(
+                    nextKey,
+                    probabilityMap.get(
+                        nextKey
+                    )
+                    +
+                    nextProbability
+                );
             }
         }
     }
@@ -114,16 +140,17 @@ function calculateDistribution(
     debug(
         "Calculation complete",
         {
-            dates:
-                results.size,
-            seconds:
+            processedDates:
+                processed,
+            uniqueDates:
+                arrivalProbabilities.size,
+            runtimeSeconds:
                 (
                     performance.now()
-                    -
-                    t0
+                    - t0
                 ) / 1000
         }
     );
 
-    return results;
+    return arrivalProbabilities;
 }
