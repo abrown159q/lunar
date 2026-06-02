@@ -15,7 +15,13 @@ function saveSettings() {
         maxGap:
             document.getElementById(
                 "maxGap"
-            ).value
+            ).value,
+
+        homeDays:
+            document.getElementById(
+                "homeDays"
+            ).value,
+            
     };
 
     debug(
@@ -61,6 +67,11 @@ function loadSettings() {
         "maxGap"
     ).value =
     settings.maxGap || 30;
+
+    document.getElementById(
+        "homeDays"
+    ).value =
+    settings.homeDays || 5;
 }
 
 function clearStorage() {

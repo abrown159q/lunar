@@ -233,6 +233,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     debug("DOMContentLoaded: attaching runBtn listener");
 
+    // Calculate
     document.getElementById("runBtn")
         .addEventListener("click", runPrediction);
 
