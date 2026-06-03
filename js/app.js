@@ -191,43 +191,6 @@ function setupHome() {
 
     debug("setupHome: attaching enterBtn listener");
 
-    // document.getElementById("enterBtn").addEventListener(
-    //     "click",
-    //     () => {
-
-    //         debug("enterBtn: clicked");
-
-    //         try {
-
-    //             const lastDate = parseHomeInput();
-                
-    //             if (!lastDate) {
-    //                 debug("enterBtn: no valid date parsed, showing alert");
-    //                 alert("Enter a date or number of days.");
-    //                 return;
-    //             }
-
-    //             const dateStr = lastDate.toISOString().slice(0, 10);
-    //             // saveSettings();
-    //             debug("enterBtn: setting lastDate input to", dateStr);
-
-    //             document.getElementById("lastDate").value = dateStr;
-    //             console.log("here!!!!")
-    //             showDashboard();
-    //             console.log("there!!")
-    //             runPrediction();
-    //             initializeCalendar();
-
-
-    //             debug("enterBtn: entered dashboard successfully");
-    //         }
-    //         catch (err) {
-    //             console.error("enterBtn: error during click handler ->", err);
-    //             debug("enterBtn: ERROR - " + err.message);
-    //         }
-    //     }
-    // );
-
         document.getElementById("enterBtnDate").addEventListener(
         "click",
         () => {
