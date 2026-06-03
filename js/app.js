@@ -149,83 +149,52 @@ console.log(
 
 function setupHome() {
 
-    debug("setupHome: attaching enterBtn listener");
+document.getElementById("enterBtnDate")
+.addEventListener("click", () => {
 
-        document.getElementById("enterBtnDate").addEventListener(
-        "click",
-        () => {
+    const lastDate = parseHomeInputDate();
 
-            debug("enterBtnDate: clicked");
+    if (!lastDate) {
+        alert("Enter a date.");
+        return;
+    }
 
-            try {
-
-                const lastDate = parseHomeInputDate();
-                
-                if (!lastDate) {
-                    debug("enterBtn: no valid date parsed, showing alert");
-                    alert("Enter a date or number of days.");
-                    return;
-                }
-
-                const dateStr = lastDate.toISOString().slice(0, 10);
-                saveSettings();
-                debug("enterBtn: setting lastDate input to", dateStr);
-
-                document.getElementById("lastDate").value = dateStr;
-
-                showDashboard();
-
-                runPrediction();
-                initializeCalendar();
+    enterSystem(lastDate);
+});
 
 
-                debug("enterBtn: entered dashboard successfully");
-            }
-            catch (err) {
-                console.error("enterBtn: error during click handler ->", err);
-                debug("enterBtn: ERROR - " + err.message);
-            }
-        }
-    );
+document.getElementById("enterBtnDaysSince")
+.addEventListener("click", () => {
 
-           document.getElementById("enterBtnDaysSince").addEventListener(
-        "click",
-        () => {
+    const lastDate = parseHomeInputDaysSince();
 
-            debug("enterBtnDaysSince: clicked");
+    if (!lastDate) {
+        alert("Enter days since.");
+        return;
+    }
 
-            try {
+    enterSystem(lastDate);
+});
 
-                const lastDate = parseHomeInputDaysSince();
-                
-                if (!lastDate) {
-                    debug("enterBtn: no valid date parsed, showing alert");
-                    alert("Enter a date or number of days.");
-                    return;
-                }
-
-                const dateStr = lastDate.toISOString().slice(0, 10);
-                saveSettings();
-                debug("enterBtn: setting lastDate input to", dateStr);
-
-                document.getElementById("lastDate").value = dateStr;
-                console.log("here!!!!")
-                showDashboard();
-                console.log("there!!")
-                runPrediction();
-                initializeCalendar();
-
-
-                debug("enterBtn: entered dashboard successfully");
-            }
-            catch (err) {
-                console.error("enterBtn: error during click handler ->", err);
-                debug("enterBtn: ERROR - " + err.message);
-            }
-        }
-    );
 
     debug("setupHome: done");
+}
+
+function enterSystem(lastDate) {
+
+    const dateStr =
+        lastDate.toISOString().slice(0, 10);
+
+    document.getElementById("lastDate").value =
+        dateStr;
+
+    saveSettings();
+
+    showDashboard();
+
+    runPrediction();
+
+    debug("enterSystem complete");
 }
 
 /* =========================
