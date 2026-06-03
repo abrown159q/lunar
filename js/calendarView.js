@@ -43,10 +43,6 @@ function updateCalendar(
     lastAppearanceDate
 ){
 
-    console.log(">>> updateCalendar CALLED");
-    debug("updateCalendar CALLED");
-
-    console.log("args:", probabilities, lastAppearanceDate);
     calendar.removeAllEvents();
 
     const events = [];
@@ -100,10 +96,7 @@ function updateCalendar(
     }
 
 
-    debug(
-        "Added known appearance:",
-        lastAppearanceDate
-    );
+
 
     console.log(events);
     
