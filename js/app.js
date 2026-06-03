@@ -12,47 +12,6 @@ function showDashboard() {
     debug("showDashboard: done");
 }
 
-function parseHomeInput() {
-
-    debug("parseHomeInput: reading home screen inputs");
-
-    const dateInput =
-        document.getElementById("homeDate").value;
-
-    const daysInput =
-        document.getElementById("homeDays").value;
-
-    debug("parseHomeInput: dateInput =", dateInput, "| daysInput =", daysInput);
-
-    let lastDate = null;
-
-    if (dateInput) {
-
-        lastDate = new Date(dateInput);
-
-        debug("parseHomeInput: using date input ->", dateInput);
-    }
-    else if (daysInput) {
-
-        const d = new Date();
-
-        d.setDate(
-            d.getDate() - Number(daysInput)
-        );
-
-        lastDate = d;
-
-        debug("parseHomeInput: using days input", daysInput, "-> computed date", lastDate);
-    }
-    else {
-        debug("parseHomeInput: no input provided, returning null");
-    }
-
-    debug("parseHomeInput: returning", lastDate);
-
-    return lastDate;
-}
-
 function parseHomeInputDate() {
 
     debug("parseHomeInput: reading home screen inputs");
@@ -212,9 +171,9 @@ function setupHome() {
                 debug("enterBtn: setting lastDate input to", dateStr);
 
                 document.getElementById("lastDate").value = dateStr;
-                console.log("here!!!!")
+
                 showDashboard();
-                console.log("there!!")
+
                 runPrediction();
                 initializeCalendar();
 
