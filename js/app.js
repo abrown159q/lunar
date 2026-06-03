@@ -126,7 +126,8 @@ console.log(
     const probabilities =
         calculateDistribution(
             new Date(dateStr),
-            90   // SAFE DEBUG HORIZON
+            //90   // SAFE DEBUG HORIZON
+            365    // Full year calculation
         );
 
     const daysUntil =
