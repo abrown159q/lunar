@@ -17,10 +17,7 @@ function saveSettings() {
                 "maxGap"
             ).value,
 
-        homeDays:
-            document.getElementById(
-                "homeDays"
-            ).value,
+
             
     };
 
@@ -57,6 +54,43 @@ function loadSettings() {
         "lastDate"
     ).value =
     settings.lastDate || "";
+    
+    /*
+     * Restore home screen date field
+     */
+
+    document.getElementById(
+        "homeDate"
+    ).value =
+        settings.lastDate || "";
+
+    /*
+     * Recompute days-since from stored date
+     */
+
+    if (settings.lastDate) {
+
+        const today =
+            new Date();
+
+        const lastDate =
+            new Date(
+                settings.lastDate
+            );
+
+        const daysSince =
+            Math.floor(
+                (
+                    today -
+                    lastDate
+                ) / 86400000
+            );
+
+        document.getElementById(
+            "homeDays"
+        ).value =
+            daysSince;
+    }
 
     document.getElementById(
         "minGap"
@@ -71,8 +105,13 @@ function loadSettings() {
     document.getElementById(
         "homeDays"
     ).value =
-    settings.homeDays || 5;
+        calculateDaysSince(
+            settings.lastDate
+        );
+
 }
+
+
 
 function clearStorage() {
 
@@ -80,5 +119,21 @@ function clearStorage() {
 
     debug(
         "localStorage cleared"
+    );
+}
+
+function calculateDaysSince(lastDateString) {
+
+    const today =
+        new Date();
+
+    const lastDate =
+        new Date(lastDateString);
+
+    const diffMs =
+        today - lastDate;
+
+    return Math.floor(
+        diffMs / 86400000
     );
 }

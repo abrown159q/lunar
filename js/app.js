@@ -53,6 +53,50 @@ function parseHomeInput() {
     return lastDate;
 }
 
+function parseHomeInputDate() {
+
+    debug("parseHomeInput: reading home screen inputs");
+
+    const dateInput =
+        document.getElementById("homeDate").value;
+
+    let lastDate = null;
+
+    lastDate = new Date(dateInput);
+
+        debug("parseHomeInput: using date input ->", dateInput);
+
+    debug("parseHomeInput: returning", lastDate);
+
+    return lastDate;
+}
+
+function parseHomeInputDaysSince() {
+
+    debug("parseHomeInputDaysSince: reading home screen inputs");
+
+    const daysInput =
+        document.getElementById("homeDays").value;
+
+    let lastDate = null;
+
+
+        const d = new Date();
+
+        d.setDate(
+            d.getDate() - Number(daysInput)
+        );
+
+        lastDate = d;
+
+        debug("parseHomeInput: using days input", daysInput, "-> computed date", lastDate);
+
+    debug("parseHomeInput: returning", lastDate);
+
+    return lastDate;
+}
+
+
 function updateTopDates(probabilities) {
 
     debug("updateTopDates: building ranked date list");
@@ -147,16 +191,53 @@ function setupHome() {
 
     debug("setupHome: attaching enterBtn listener");
 
-    document.getElementById("enterBtn").addEventListener(
+    // document.getElementById("enterBtn").addEventListener(
+    //     "click",
+    //     () => {
+
+    //         debug("enterBtn: clicked");
+
+    //         try {
+
+    //             const lastDate = parseHomeInput();
+                
+    //             if (!lastDate) {
+    //                 debug("enterBtn: no valid date parsed, showing alert");
+    //                 alert("Enter a date or number of days.");
+    //                 return;
+    //             }
+
+    //             const dateStr = lastDate.toISOString().slice(0, 10);
+    //             // saveSettings();
+    //             debug("enterBtn: setting lastDate input to", dateStr);
+
+    //             document.getElementById("lastDate").value = dateStr;
+    //             console.log("here!!!!")
+    //             showDashboard();
+    //             console.log("there!!")
+    //             runPrediction();
+    //             initializeCalendar();
+
+
+    //             debug("enterBtn: entered dashboard successfully");
+    //         }
+    //         catch (err) {
+    //             console.error("enterBtn: error during click handler ->", err);
+    //             debug("enterBtn: ERROR - " + err.message);
+    //         }
+    //     }
+    // );
+
+        document.getElementById("enterBtnDate").addEventListener(
         "click",
         () => {
 
-            debug("enterBtn: clicked");
+            debug("enterBtnDate: clicked");
 
             try {
 
-                const lastDate = parseHomeInput();
-
+                const lastDate = parseHomeInputDate();
+                
                 if (!lastDate) {
                     debug("enterBtn: no valid date parsed, showing alert");
                     alert("Enter a date or number of days.");
@@ -164,13 +245,53 @@ function setupHome() {
                 }
 
                 const dateStr = lastDate.toISOString().slice(0, 10);
-
+                saveSettings();
                 debug("enterBtn: setting lastDate input to", dateStr);
 
                 document.getElementById("lastDate").value = dateStr;
-
+                console.log("here!!!!")
                 showDashboard();
+                console.log("there!!")
+                runPrediction();
                 initializeCalendar();
+
+
+                debug("enterBtn: entered dashboard successfully");
+            }
+            catch (err) {
+                console.error("enterBtn: error during click handler ->", err);
+                debug("enterBtn: ERROR - " + err.message);
+            }
+        }
+    );
+
+           document.getElementById("enterBtnDaysSince").addEventListener(
+        "click",
+        () => {
+
+            debug("enterBtnDaysSince: clicked");
+
+            try {
+
+                const lastDate = parseHomeInputDaysSince();
+                
+                if (!lastDate) {
+                    debug("enterBtn: no valid date parsed, showing alert");
+                    alert("Enter a date or number of days.");
+                    return;
+                }
+
+                const dateStr = lastDate.toISOString().slice(0, 10);
+                saveSettings();
+                debug("enterBtn: setting lastDate input to", dateStr);
+
+                document.getElementById("lastDate").value = dateStr;
+                console.log("here!!!!")
+                showDashboard();
+                console.log("there!!")
+                runPrediction();
+                initializeCalendar();
+
 
                 debug("enterBtn: entered dashboard successfully");
             }
@@ -220,13 +341,14 @@ document.addEventListener("DOMContentLoaded", () => {
     debug("DOMContentLoaded: application starting");
 
     // Show home first so the dashboard is never visible on load
+    loadSettings();
     showHome();
 
     debug("DOMContentLoaded: initializing calendar");
     initializeCalendar();
 
     debug("DOMContentLoaded: loading saved settings");
-    loadSettings();
+    // loadSettings();
 
     setupHome();
     setupBackButton();
