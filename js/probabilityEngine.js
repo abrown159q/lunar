@@ -165,3 +165,51 @@ function calculateDistribution(
 
     return arrivalProbabilities;
 }
+
+function getMostLikelyDate(
+    probabilities
+) {
+
+    let bestDate = null;
+    let bestProb = -1;
+
+    for (
+        const [date, prob]
+        of probabilities
+    ) {
+
+        if (prob > bestProb) {
+
+            bestProb = prob;
+            bestDate = date;
+        }
+    }
+
+    return bestDate;
+}
+
+function getDaysUntilAppearance(
+    probabilities
+) {
+
+    const bestDate =
+        getMostLikelyDate(
+            probabilities
+        );
+
+    if (!bestDate)
+        return null;
+
+    const today =
+        new Date();
+
+    const target =
+        new Date(bestDate);
+
+    const diffMs =
+        target - today;
+
+    return Math.ceil(
+        diffMs / 86400000
+    );
+}

@@ -129,6 +129,22 @@ console.log(
             90   // SAFE DEBUG HORIZON
         );
 
+    const daysUntil =
+    getDaysUntilAppearance(
+        probabilities
+    );
+
+    debug(
+        "Days until appearance:",
+        daysUntil
+    );
+    
+    document.getElementById(
+        "daysUntilLabel"
+        ).textContent =
+            "Days Until Appearance: "
+            + daysUntil;
+            
     debug("runPrediction: distribution calculated, updating views");
     
     
