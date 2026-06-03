@@ -3,7 +3,7 @@
 ## High Priority
 
 - [X] Remove user-configurable min/max cycle controls
-- [ ] Automatically display known appearance date on calendar
+- [X] Automatically display known appearance date on calendar
 - [ ] Auto-run prediction when entering dashboard
 
 ## Medium Priority
