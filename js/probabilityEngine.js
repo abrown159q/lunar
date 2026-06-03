@@ -1,15 +1,26 @@
 const DAY_MS = 86400000;
+const DEFAULT_MIN_GAP = 30;
+const DEFAULT_MAX_GAP = 32;
 
 function formatDate(date) {
     return date.toISOString().slice(0, 10);
 }
-
 function calculateDistribution(
     startDate,
-    minGap,
-    maxGap,
     horizonDays
 ) {
+
+    const minGap =
+        DEFAULT_MIN_GAP;
+
+    const maxGap =
+        DEFAULT_MAX_GAP;
+
+    debug(
+        "calculateDistribution:",
+        "minGap =", minGap,
+        "maxGap =", maxGap
+    );
 
     const t0 = performance.now();
 

@@ -7,16 +7,6 @@ function saveSettings() {
                 "lastDate"
             ).value,
 
-        minGap:
-            document.getElementById(
-                "minGap"
-            ).value,
-
-        maxGap:
-            document.getElementById(
-                "maxGap"
-            ).value,
-
 
             
     };
@@ -92,15 +82,6 @@ function loadSettings() {
             daysSince;
     }
 
-    document.getElementById(
-        "minGap"
-    ).value =
-    settings.minGap || 26;
-
-    document.getElementById(
-        "maxGap"
-    ).value =
-    settings.maxGap || 30;
 
     document.getElementById(
         "homeDays"

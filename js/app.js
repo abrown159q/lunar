@@ -111,21 +111,12 @@ function runPrediction() {
         return;
     }
 
-    const minGap =
-        Number(document.getElementById("minGap").value);
-
-    const maxGap =
-        Number(document.getElementById("maxGap").value);
-
-    debug("runPrediction: minGap =", minGap, "| maxGap =", maxGap);
 
     debug("runPrediction: calling calculateDistribution");
 
     const probabilities =
         calculateDistribution(
             new Date(dateStr),
-            minGap,
-            maxGap,
             90   // SAFE DEBUG HORIZON
         );
 
