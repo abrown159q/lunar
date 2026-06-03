@@ -96,6 +96,15 @@ function updateTopDates(probabilities) {
 
 function runPrediction() {
 
+    debug("runPrediction START");
+
+console.log("runPrediction START");
+
+console.log(
+    "lastDate input raw:",
+    document.getElementById("lastDate").value
+);
+
     clearDebug();
 
     debug("runPrediction: started");
@@ -121,8 +130,9 @@ function runPrediction() {
         );
 
     debug("runPrediction: distribution calculated, updating views");
-
-    updateCalendar(probabilities);
+    
+    
+    updateCalendar(probabilities, dateStr);
     updateChart(probabilities);
     updateTopDates(probabilities);
 

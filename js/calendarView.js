@@ -39,12 +39,36 @@ function initializeCalendar(){
 }
 
 function updateCalendar(
-    probabilities
+    probabilities,
+    lastAppearanceDate
 ){
 
+    console.log(">>> updateCalendar CALLED");
+    debug("updateCalendar CALLED");
+
+    console.log("args:", probabilities, lastAppearanceDate);
     calendar.removeAllEvents();
 
     const events = [];
+ 
+
+    events.push({
+
+        start: lastAppearanceDate,
+
+        title: "★ Known",
+
+        backgroundColor: "#00aa00",
+
+        borderColor: "#006600"
+    });
+
+
+    debug(
+        "Added known appearance:",
+        lastAppearanceDate
+    );
+
 
     for(
         const
@@ -75,6 +99,15 @@ function updateCalendar(
         });
     }
 
+
+    debug(
+        "Added known appearance:",
+        lastAppearanceDate
+    );
+
+    console.log(events);
+    
+    
     calendar.addEventSource(
         events
     );
