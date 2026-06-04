@@ -11,6 +11,10 @@
 - [X] Add days until label
 - [ ] Add in cycle predictions for future months
 - [ ] Get rid of 0% colors and make other percentages brighter ()
+- [ ] Load last appearance if history is given
+- [ ] Select single or history mode from front page
+- [ ] Show past dates on normal view
+- [ ] Show historical dates on side for debugging of calculation
 
 ## Medium Priority
 
