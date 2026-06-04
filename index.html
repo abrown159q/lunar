@@ -51,8 +51,12 @@
             Enter System by days since
         </button>
 
+        <br><br>
+
+        <a href="history.html">History add page </a>
+
     </div>
-           <h2>Debug Console</h2>
+        <h2>Debug Console</h2>
             <pre id="debugConsole"></pre>
 </section>
 
@@ -77,6 +81,25 @@
 
         <button id="runBtn">Recalculate</button>
         <button id="backBtn">Home</button>
+
+        <label>
+    <input
+        type="radio"
+        name="predictionMode"
+        value="single"
+        checked
+    >
+    Use Last Appearance
+    </label>
+
+    <label>
+    <input
+        type="radio"
+        name="predictionMode"
+        value="history"
+    >
+    Use Historical Appearances
+    </label>
         
 
     </section>
@@ -105,7 +128,7 @@
     </div>
 
 </section>
-
+<script src="js/historyEngine.js"></script>
 <script src="js/debug.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/probabilityEngine.js"></script>

@@ -123,12 +123,39 @@ console.log(
 
     debug("runPrediction: calling calculateDistribution");
 
-    const probabilities =
-        calculateDistribution(
-            new Date(dateStr),
-            //90   // SAFE DEBUG HORIZON
-            365    // Full year calculation
-        );
+    // const probabilities =
+    //     calculateDistribution(
+    //         new Date(dateStr),
+    //         //90   // SAFE DEBUG HORIZON
+    //         365    // Full year calculation
+    //     );
+
+
+    let probabilities;
+
+    const mode =
+        getPredictionMode();
+
+    let daysIntoFuture = 365;
+    if(mode === "single") {
+
+        probabilities =
+            calculateDistributionFromLastDate(
+                new Date(dateStr),
+                daysIntoFuture
+            );
+    }
+    else {
+
+        const dates =
+            loadAppearanceDates();
+
+        probabilities =
+            calculateDistributionFromHistory(
+                dates,
+                daysIntoFuture
+            );
+    }
 
     const daysUntil =
     getDaysUntilAppearance(
@@ -281,3 +308,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     debug("DOMContentLoaded: application ready");
 });
+
+function getPredictionMode() {
+
+    return document.querySelector(
+        'input[name="predictionMode"]:checked'
+    ).value;
+}
+
+const STORAGE_KEY = "historyAppearanceDates";
+
+function loadAppearanceDates() {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+}

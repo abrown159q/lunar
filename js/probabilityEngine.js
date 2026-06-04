@@ -5,7 +5,7 @@ const DEFAULT_MAX_GAP = 32;
 function formatDate(date) {
     return date.toISOString().slice(0, 10);
 }
-function calculateDistribution(
+function calculateDistributionFromLastDate(
     startDate,
     horizonDays
 ) {
