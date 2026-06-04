@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Event Marker Editor</title>
+
+<link
+    href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css"
+    rel="stylesheet"
+>
+
+<style>
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background: #f5f5f5;
+}
+
+h1 {
+    text-align: center;
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+.panel {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+#calendar {
+    min-height: 700px;
+}
+
+.modeGroup label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 8px 15px;
+    cursor: pointer;
+}
+
+#markerList {
+    max-height: 350px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+.markerRow {
+    border-bottom: 1px solid #ddd;
+    padding: 6px;
+}
+
+.colorBox {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+    border: 1px solid #333;
+    vertical-align: middle;
+}
+
+#debug {
+    background: black;
+    color: #00ff00;
+    padding: 10px;
+    height: 200px;
+    overflow-y: auto;
+    font-family: monospace;
+    margin-top: 20px;
+}
+
+@media(max-width:1000px){
+
+    .layout{
+        grid-template-columns:1fr;
+    }
+
+}
+
+</style>
+
+</head>
+<body>
+
+<h1>Event Marker Editor</h1>
+
+<div class="layout">
+
+    <div class="panel">
+
+        <h2>Calendar</h2>
+
+        <p>
+            Select a marker type, then click a day.
+            Existing markers are protected and cannot be overwritten.
+            Use "Delete Marker" mode to remove one.
+        </p>
+
+        <div id="calendar"></div>
+
+    </div>
+
+    <div class="panel">
+
+        <h2>Marker Mode</h2>
+
+        <div class="modeGroup">
+
+            <label>
+                <input
+                    type="radio"
+                    name="markerMode"
+                    value="red"
+                    checked
+                >
+                Red Marker
+            </label>
+
+            <label>
+                <input
+                    type="radio"
+                    name="markerMode"
+                    value="green"
+                >
+                Green Marker
+            </label>
+
+            <label>
+                <input
+                    type="radio"
+                    name="markerMode"
+                    value="blue"
+                >
+                Blue Marker
+            </label>
+
+            <label>
+                <input
+                    type="radio"
+                    name="markerMode"
+                    value="delete"
+                >
+                Delete Marker
+            </label>
+
+        </div>
+
+        <hr>
+
+        <h2>Stored Markers</h2>
+
+        <div id="markerList"></div>
+
+        <br>
+
+        <button id="clearBtn">
+            Clear All Markers
+        </button>
+
+        <hr>
+
+        <h2>Statistics</h2>
+
+        <table>
+
+            <tr>
+                <td>Total Markers:</td>
+                <td id="statTotal">0</td>
+            </tr>
+
+            <tr>
+                <td>Red:</td>
+                <td id="statRed">0</td>
+            </tr>
+
+            <tr>
+                <td>Green:</td>
+                <td id="statGreen">0</td>
+            </tr>
+
+            <tr>
+                <td>Blue:</td>
+                <td id="statBlue">0</td>
+            </tr>
+
+        </table>
+
+    </div>
+
+</div>
+
+<div id="debug"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+<script>
+
+const STORAGE_KEY =
+    "eventMarkers";
+
+let markers = {};
+
+let calendar = null;
+
+let currentMode =
+    "red";
+
+/*
+--------------------------------------------------
+Debug
+--------------------------------------------------
+*/
+
+function debug(...args){
+
+    const msg =
+        args.join(" ");
+
+    console.log(msg);
+
+    const div =
+        document.getElementById(
+            "debug"
+        );
+
+    div.innerHTML +=
+        msg + "<br>";
+
+    div.scrollTop =
+        div.scrollHeight;
+}
+
+/*
+--------------------------------------------------
+Storage
+--------------------------------------------------
+*/
+
+function saveMarkers(){
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(
+            markers
+        )
+    );
+
+    debug(
+        "Saved markers:",
+        Object.keys(markers).length
+    );
+}
+
+function loadMarkers(){
+
+    markers =
+        JSON.parse(
+            localStorage.getItem(
+                STORAGE_KEY
+            ) || "{}"
+        );
+
+    debug(
+        "Loaded markers:",
+        Object.keys(markers).length
+    );
+}
+
+/*
+--------------------------------------------------
+UI Updates
+--------------------------------------------------
+*/
+
+function updateMarkerList(){
+
+    const div =
+        document.getElementById(
+            "markerList"
+        );
+
+    div.innerHTML = "";
+
+    const dates =
+        Object.keys(markers)
+        .sort();
+
+    dates.forEach(
+        date => {
+
+            const color =
+                markers[date];
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+            row.className =
+                "markerRow";
+
+            row.innerHTML =
+                `<span class="colorBox"
+                        style="background:${color}">
+                 </span>
+                 ${date}`;
+
+            div.appendChild(
+                row
+            );
+        }
+    );
+}
+
+function updateStatistics(){
+
+    const values =
+        Object.values(markers);
+
+    document.getElementById(
+        "statTotal"
+    ).textContent =
+        values.length;
+
+    document.getElementById(
+        "statRed"
+    ).textContent =
+        values.filter(
+            v => v === "red"
+        ).length;
+
+    document.getElementById(
+        "statGreen"
+    ).textContent =
+        values.filter(
+            v => v === "green"
+        ).length;
+
+    document.getElementById(
+        "statBlue"
+    ).textContent =
+        values.filter(
+            v => v === "blue"
+        ).length;
+}
+
+function refreshCalendar(){
+
+    calendar.removeAllEvents();
+
+    Object.entries(
+        markers
+    ).forEach(
+
+        ([date,color]) => {
+
+            calendar.addEvent({
+
+                start: date,
+
+                title: "",
+
+                backgroundColor:
+                    color,
+
+                borderColor:
+                    color
+            });
+        }
+    );
+}
+
+function refreshUI(){
+
+    updateMarkerList();
+
+    updateStatistics();
+
+    refreshCalendar();
+}
+
+/*
+--------------------------------------------------
+Marker Logic
+--------------------------------------------------
+*/
+
+function toggleMarker(
+    dateStr
+){
+
+    debug(
+        "Clicked:",
+        dateStr,
+        "| Mode:",
+        currentMode
+    );
+
+    if(
+        currentMode ===
+        "delete"
+    ){
+
+        if(
+            markers[dateStr]
+        ){
+
+            delete markers[
+                dateStr
+            ];
+
+            debug(
+                "Deleted marker:",
+                dateStr
+            );
+
+            saveMarkers();
+
+            refreshUI();
+        }
+
+        return;
+    }
+
+    /*
+    Existing marker protected.
+    */
+
+    if(
+        markers[dateStr]
+    ){
+
+        debug(
+            "Marker already exists:",
+            dateStr
+        );
+
+        return;
+    }
+
+    markers[
+        dateStr
+    ] =
+    currentMode;
+
+    debug(
+        "Added",
+        currentMode,
+        "marker on",
+        dateStr
+    );
+
+    saveMarkers();
+
+    refreshUI();
+}
+
+/*
+--------------------------------------------------
+Calendar
+--------------------------------------------------
+*/
+
+function initializeCalendar(){
+
+    calendar =
+        new FullCalendar.Calendar(
+
+            document.getElementById(
+                "calendar"
+            ),
+
+            {
+
+                initialView:
+                    "dayGridMonth",
+
+                height: 700,
+
+                dateClick:
+                    function(info){
+
+                        toggleMarker(
+                            info.dateStr
+                        );
+                    }
+            }
+        );
+
+    calendar.render();
+
+    debug(
+        "Calendar initialized"
+    );
+}
+
+/*
+--------------------------------------------------
+Mode Selector
+--------------------------------------------------
+*/
+
+function initializeModes(){
+
+    document
+        .querySelectorAll(
+            'input[name="markerMode"]'
+        )
+        .forEach(
+
+            radio => {
+
+                radio.addEventListener(
+                    "change",
+                    () => {
+
+                        currentMode =
+                            radio.value;
+
+                        debug(
+                            "Mode changed:",
+                            currentMode
+                        );
+                    }
+                );
+            }
+        );
+}
+
+/*
+--------------------------------------------------
+Startup
+--------------------------------------------------
+*/
+
+document.addEventListener(
+    "DOMContentLoaded",
+    ()=>{
+
+        loadMarkers();
+
+        initializeCalendar();
+
+        initializeModes();
+
+        refreshUI();
+
+        document
+            .getElementById(
+                "clearBtn"
+            )
+            .addEventListener(
+                "click",
+                ()=>{
+
+                    if(
+                        !confirm(
+                            "Delete all markers?"
+                        )
+                    ){
+                        return;
+                    }
+
+                    markers = {};
+
+                    saveMarkers();
+
+                    refreshUI();
+
+                    debug(
+                        "All markers cleared"
+                    );
+                }
+            );
+
+        debug(
+            "Marker editor ready"
+        );
+    }
+);
+
+</script>
+
+</body>
+</html>
