@@ -140,9 +140,9 @@ button {
                 <input
                     type="radio"
                     name="markerMode"
-                    value="white"
+                    value="blue"
                 >
-                White Marker
+                Blue Marker
             </label>
 
             <label>
@@ -190,8 +190,8 @@ button {
             </tr>
 
             <tr>
-                <td>White:</td>
-                <td id="statWhite">0</td>
+                <td>Blue:</td>
+                <td id="statBlue">0</td>
             </tr>
 
         </table>
@@ -348,10 +348,10 @@ function updateStatistics(){
         ).length;
 
     document.getElementById(
-        "statWhite"
+        "statBlue"
     ).textContent =
         values.filter(
-            v => v === "white"
+            v => v === "blue"
         ).length;
 }
 
