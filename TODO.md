@@ -6,9 +6,11 @@
 - [X] Automatically display known appearance date on calendar
 - [X] Auto-run prediction when entering dashboard
 - [ ] Add in warnings if no values in fields
-- [ ] Do calendar can add in appearance history and average
-- [ ] Change two buttons to one button and radio buttons
+- [X] Do calendar can add in appearance history and average
+- [X] Change two buttons to one button and radio buttons
 - [X] Add days until label
+- [ ] Add in cycle predictions for future months
+- [ ] Get rid of 0% colors and make other percentages brighter ()
 
 ## Medium Priority
 
