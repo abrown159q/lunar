@@ -82,8 +82,8 @@ def generate_normal_interval(
     return dates
 
 
-START = date(2020, 1, 1)
-COUNT = 150
+START = date(2023, 1, 1)
+COUNT = 36
 
 save_dataset(
     "Every 31 Days",
