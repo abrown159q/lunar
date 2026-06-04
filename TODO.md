@@ -17,9 +17,13 @@
 - [ ] Add yearly heatmap
 - [ ] Track white dot
 - [ ] 
+If growth expected:
 
+historyStorage.js → persistence only
+historyService.js → logic (transform/filter dates)
 
 ## Low Priority
 
 - [ ] Export predictions
 - [ ] Dark mode
+
